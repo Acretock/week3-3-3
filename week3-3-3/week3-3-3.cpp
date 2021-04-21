@@ -5,17 +5,19 @@
 
 using namespace std;
 
+
+
 class Person
 {
 public:
-	Person();
+	Person(const string& first, const string& last, const int& b);
 	~Person();
 	void ChangeFirstName(int year, const string& name) {
-		//First = name;
+		if (birth!=0)
 		First.insert({ year,name });
 	}
 	void ChangeLastName(int year, const string& last) {
-		//Last = last;
+		if (birth != 0)
 		Last.insert({ year,last });
 	}
 
@@ -100,39 +102,49 @@ public:
 	}
 
 	string GetFullName(int year) {
-		int firstnamechange1 = First.lower_bound(0)->first;
-		int lastnamechange1 = Last.lower_bound(0)->first;
-		if (((firstnamechange1 > year) && (lastnamechange1 > year)))	// if changes happend after year
-			return "Incognito";
-		if ((firstnamechange1 <= year) && (lastnamechange1 > year))		// if first name changed but last wasn't
-			return First.lower_bound(FindFirstYear(year))->second + " with unnown last name";
-		if ((lastnamechange1 <= year) && (firstnamechange1 > year))		// if last name changed but first wasn't
-			return Last.lower_bound(FindLastYear(year))->second + " with unnown last name";
-		if ((lastnamechange1 <= year) && (firstnamechange1 <= year))	// if all was changed
-			return First.lower_bound(FindFirstYear(year))->second + ' ' + Last.lower_bound(FindLastYear(year))->second;
+		if (birth <= year) {
+			int firstnamechange1 = First.lower_bound(0)->first;
+			int lastnamechange1 = Last.lower_bound(0)->first;
+			if (((firstnamechange1 > year) && (lastnamechange1 > year)))	// if changes happend after year
+				return "Incognito";
+			if ((firstnamechange1 <= year) && (lastnamechange1 > year))		// if first name changed but last wasn't
+				return First.lower_bound(FindFirstYear(year))->second + " with unnown last name";
+			if ((lastnamechange1 <= year) && (firstnamechange1 > year))		// if last name changed but first wasn't
+				return Last.lower_bound(FindLastYear(year))->second + " with unnown last name";
+			if ((lastnamechange1 <= year) && (firstnamechange1 <= year))	// if all was changed
+				return First.lower_bound(FindFirstYear(year))->second + ' ' + Last.lower_bound(FindLastYear(year))->second;
+		}
+		else return "No person";
 	}
 
 	string GetFullNameWithHistory(int year) {
-		int firstnamechange1 = First.lower_bound(0)->first;
-		int lastnamechange1 = Last.lower_bound(0)->first;
-		if (((firstnamechange1 > year) && (lastnamechange1 > year)))	// if changes happend after year
-			return "Incognito";
-		if ((firstnamechange1 <= year) && (lastnamechange1 > year))		// if first name changed but last wasn't
-			return HistoryFirst(year) + "with unnown last name";
-		if ((lastnamechange1 <= year) && (firstnamechange1 > year))		// if last name changed but first wasn't
-			return HistoryLast(year) + "with unnown last name";
-		if ((lastnamechange1 <= year) && (firstnamechange1 <= year))	// if all was changed
-			return HistoryFirst(year) + " " + HistoryLast(year);
+		if (birth <= year) {
+			int firstnamechange1 = First.lower_bound(0)->first;
+			int lastnamechange1 = Last.lower_bound(0)->first;
+			if (((firstnamechange1 > year) && (lastnamechange1 > year)))	// if changes happend after year
+				return "Incognito";
+			if ((firstnamechange1 <= year) && (lastnamechange1 > year))		// if first name changed but last wasn't
+				return HistoryFirst(year) + "with unnown last name";
+			if ((lastnamechange1 <= year) && (firstnamechange1 > year))		// if last name changed but first wasn't
+				return HistoryLast(year) + "with unnown last name";
+			if ((lastnamechange1 <= year) && (firstnamechange1 <= year))	// if all was changed
+				return HistoryFirst(year) + " " + HistoryLast(year);
+		}
+		else return "No person";
 	}
 
 
 private:
 	map<int, string> First;
 	map<int, string> Last;
+	int birth;
 };
 
-Person::Person()
+Person::Person(const string& first, const string& last, const int& b)
 {
+	this->First[birth] = first;
+	this->Last[birth] = last;
+	this->birth = b;
 }
 
 Person::~Person()
@@ -142,37 +154,19 @@ Person::~Person()
 
 int main()
 {
-	Person person;
+	Person person("Polina", "Sergeeva", 1960);;
 
-	person.ChangeFirstName(1965, "Polina");
-	person.ChangeLastName(1967, "Sergeeva");
-	for (int year : { 1900, 1965, 1990 }) {
+	for (int year : { 1959,1960 }) {
 		cout << person.GetFullNameWithHistory(year) << endl;
 	}
 
-	person.ChangeFirstName(1970, "Appolinaria");
-	for (int year : { 1969, 1970 }) {
+	person.ChangeFirstName(1965, "Appolinaria");
+	person.ChangeLastName(1967, "Ivanova");
+	for (int year : { 1965, 1967 }) {
 		cout << person.GetFullNameWithHistory(year) << endl;
 	}
 
-	person.ChangeLastName(1968, "Volkova");
-	for (int year : { 1969, 1970 }) {
-		cout << person.GetFullNameWithHistory(year) << endl;
-	}
-	person.ChangeFirstName(1990, "Polina");
-	person.ChangeLastName(1990, "Volkova-Sergeeva");
-	cout << person.GetFullNameWithHistory(1990) << endl;
 
-	person.ChangeFirstName(1966, "Pauline");
-	cout << person.GetFullNameWithHistory(1966) << endl;
-
-	person.ChangeLastName(1960, "Sergeeva");
-	for (int year : { 1960, 1967 }) {
-		cout << person.GetFullNameWithHistory(year) << endl;
-	}
-
-	person.ChangeLastName(1961, "Ivanova");
-	cout << person.GetFullNameWithHistory(1967) << endl;
 
 	/*
 	Incognito
